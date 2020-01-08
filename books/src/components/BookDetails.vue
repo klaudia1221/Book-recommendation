@@ -1,0 +1,11 @@
+<template>
+<h1>Book details</h1>
+</template>
+
+<script>
+export default {
+    
+name: 'BookDetails',
+data: () => ({
+})}
+</script>
