@@ -21,6 +21,8 @@
                 {{book.average_rating}}
               </v-chip>
               <v-btn to="/about" right color="orange" text>Explore</v-btn>
+              <router-link :to="{ name: 'bookdetails', params: { id: book.title }}">Details</router-link>
+
             </v-card-actions>
           </v-card>
         </v-flex>
