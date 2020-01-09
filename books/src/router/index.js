@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import BookDetails from '../components/BookDetails.vue'
 
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
     component: BookDetails,
     props: true,
   },
+
   {
     path: '/bookrecommendation',
     name: 'bookrecommendation',

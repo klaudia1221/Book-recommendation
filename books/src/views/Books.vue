@@ -3,32 +3,40 @@
     <v-container fill-height fluid>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field v-model="search" centered label="Search"></v-text-field>
+          <v-text-field v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
         </v-col>
       </v-row>
     </v-container>
 
     <div v-if="dataReady">
       <v-container class="my-5">
-        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages" :key="book.index">
-          <v-card class="ma-3" hover >
-            <v-card-title class="one-line">{{book["authors"]}} <p>{{book.title}}</p></v-card-title>
-           
-            <v-img :src="book.image_url"></v-img>
+        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
+          <v-card :to="{ name: 'bookdetails', params: { id: book.book_id }}" class="ma-3" hover>
+            <v-card-title class="one-line">
+              <span style="height:10px, width:150px">{{book["authors"]}} {{book.title}}</span>
+            </v-card-title>
+
+            <v-img :src="book.image_url" style="height:100px, width:150px"></v-img>
             <v-card-actions>
               <v-chip>
                 <v-icon left color="yellow">mdi-star</v-icon>
                 {{book.average_rating}}
               </v-chip>
-              <v-btn to="/about" right color="orange" text>Explore</v-btn>
-              <router-link :to="{ name: 'bookdetails', params: { id: book.title }}">Details</router-link>
-
+              <v-btn
+                :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                right
+                color="orange"
+                text
+              >Explore</v-btn>
+              <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
             </v-card-actions>
           </v-card>
         </v-flex>
         <v-layout wrap></v-layout>
       </v-container>
-      <v-pagination v-model="page" :length="Math.ceil(all_books[0].length/perPage)"></v-pagination>
+
+      <v-pagination v-model="page" :length="Math.ceil(10000/this.perPage)"></v-pagination>
+
       <!-- <v-container class="my-5">
     <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
         <v-card class="ma-3">
@@ -44,7 +52,7 @@
       <v-layout row wrap></v-layout>
       </v-container>-->
       <!-- <v-btn @click="getMessage">Get books</v-btn> -->
-      <p>{{all_books[0][3].authors}}</p>
+      <!-- <p>{{visiblePages[0][3].authors}}</p> -->
     </div>
   </div>
 </template>
@@ -57,63 +65,47 @@ export default {
   data() {
     return {
       all_books: [],
-
       dataReady: false,
       page: 1,
-      perPage: 3,
-      search: ""
+      perPage: 32,
+      search: "",
+      limit: 32,
+      visiblePages: null,
+      URL: "http://127.0.0.1:5000/books"
     };
   },
-  computed: {
-    filteredList() {
-      return this.all_books[0].filter(post => {
-        return post.title.toLowerCase().includes(this.search.toLowerCase());
+  methods: {
+    doSearch() {
+      axios.get(this.URL, { params: { search: this.search } }).then(res => {
+        this.search = null;
+        this.visiblePages = res.data[0];
       });
-    },
-    visiblePages() {
-      return this.filteredList.slice(
-        (this.page - 1) * this.perPage,
-        this.page * this.perPage
-      );
+    }
+  },
+  watch: {
+    page() {
+      axios
+        .get(this.URL, { params: { page: this.page, limit: this.limit } })
+        .then(res => {
+          this.visiblePages = res.data[0];
+        });
     }
   },
 
   mounted() {
-    const URL = "http://127.0.0.1:5000/books";
-    axios.get(URL, {params:{offset:15}}).then(res => {
-      this.all_books = res.data[0];
-
-      this.dataReady = true;
-      // this.visiblePages=this.all_books[0].slice((this.page - 1)*this.perPage, this.page*this.perPage)
-    });
+    axios
+      .get(this.URL, { params: { page: 1, limit: this.limit } })
+      .then(res => {
+        this.visiblePages = res.data[0];
+        this.dataReady = true;
+      });
   }
 };
-// methods: {
-// getMessage() {
-//   const URL = "http://127.0.0.1:5000/books";
-//   axios.get(URL).then(res => {
-//     this.all_books = res.data;
-//   });
-// }
-
-// computed: {
-//   filteredList() {
-//     return this.sample_books.filter(title => {
-//       return sample_books.title.toLowerCase().includes(this.search.toLowerCase())
-//     });
-//   }
-// }
 </script>
 <style scoped>
 .container {
-  display: flex; /* or inline-flex */
-}
-.one-line{
-  font-size-adjust: inherit;
- /* overflow: hidden;  */
-  /* text-overflow: ellipsis; */
-  /* white-space: nowrap; */
-
+  display: inline-flex; /* or inline-flex */
+  flex-wrap: wrap;
 }
 </style>
 
