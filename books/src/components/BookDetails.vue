@@ -1,16 +1,25 @@
 <template>
   <div>
-    <h1>Book details</h1>
+    <!-- <h1>Book details</h1> -->
+   <p> </p>
     <!-- <p>{{this.id}}</p> -->
     <!-- <p>Current route name: {{ $route.params.id }}</p> -->
 
     <v-flex>
-      <v-card xs12 sm4 md2 lg3 class="ma-3">
-        <v-card-title>{{book_details.authors}}</v-card-title>
-        <v-img :src="book_details.image_url" contain height="15%" width="15%"></v-img>
-        <div class="text-center">
-          <v-rating v-model="rating"></v-rating>
-        </div>
+      <v-card class="ma-3">
+        <v-card-title>{{book_details.authors}} {{book_details.title}}</v-card-title>
+        <v-img class="cover-style" :src="book_details.image_url" >  </v-img> <v-rating v-model="rating"></v-rating>
+
+               <v-card-text>       <span v-html="book_details.description"></span></v-card-text>
+
+          <!-- {{description}} -->
+
+            <!-- {{book_details}} -->
+         <v-card-text> book rating: {{book_details.average_rating}} </v-card-text>
+            
+         <v-card-text>Book ratings count:{{book_details.ratings_count}}</v-card-text>
+        
+        
         <!-- <v-card-title{{book["authors"]}} <p>{{book.title}}</p></v-card-title>
            
             <v-img :src="book.image_url"></v-img>
@@ -33,29 +42,40 @@ export default {
 
   data: () => ({
     book_details: null,
-    rating: 0
+    rating: null,
+    // book_id:this.id,
+    user_id: 1,
+    book_details_URL: "http://127.0.0.1:5000/bookdetails",
+    user_ratings_URL: "http://127.0.0.1:5000/userbookrating"
   }),
   mounted() {
-    const URL = "http://127.0.0.1:5000/bookdetails";
-    axios.get(URL, { params: { book_id: this.id } }).then(res => {
+    axios.get(this.book_details_URL, { params: { book_id: this.id } }).then(res => {
       this.book_details = res.data[0][0][0];
-
+      this.user_id=1;
       this.dataReady = true;
       // this.visiblePages=this.all_books[0].slice((this.page - 1)*this.perPage, this.page*this.perPage)
     });
-  }
+    axios.get(this.user_ratings_URL,{params:{user_id:this.user_id,book_id:this.id}}).then(res=>{
+      this.rating=res.data[0][0];
+    });
+  } ,
+  watch: {
+    rating() {
+      axios.get("http://127.0.0.1:5000/newbookrating",{params:{user_id:this.user_id,book_id:this.book_id,rating:this.rating}})
+      
+      // axios
+      //   .get(this.URL, { params: { page: this.page, limit: this.limit } })
+      //   .then(res => {
+      //     this.visiblePages = res.data[0];
+      //   });
+  }}
 };
 </script>
 <style>
-.card {
-  height: 100px;
-  width: 50px;
-}
-.img {
-  height: 10%;
-  width: 10%;
-  /* overflow: hidden;  */
-  /* text-overflow: ellipsis; */
-  /* white-space: nowrap; */
+
+.cover-style {
+max-height: 400px;
+max-width: 200px; 
+margin-left: 1%
 }
 </style>

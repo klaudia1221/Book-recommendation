@@ -1,14 +1,58 @@
 <template>
-  <div class="signup">
-    <h3>Sign Up</h3>
-    <p>Let's create a new account!</p>
-    <v-text-field type="text" v-model="email" placeholder="Email"></v-text-field>
-    <br />
-    <v-text-field type="password" v-model="password" placeholder="Password"></v-text-field>
-    <br />
-    <v-btn class="pink" @click="signUp">SignUp</v-btn>
-  </div>
+<div class="signup">
+
+  <v-container>
+    <v-layout row>
+      <v-flex xs12 sm6 offset-sm3>
+        <v-card centered align-center>
+          <v-card-text>
+            <v-container>
+              <form>
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-text-field class="input-user"
+                      name="email"
+                      label="Mail"
+                      id="email"
+                      v-model="email"
+                      type="email"
+                      required></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-text-field class="input-user"
+                      name="password"
+                      label="Password"
+                      id="password"
+                      v-model="password"
+                      type="password"
+                      required></v-text-field>
+                  </v-flex>
+                </v-layout>
+           
+                
+                    <v-btn class="pink" @click="signUp">SignUp</v-btn>
+               
+              </form>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
+</div>
 </template>
+
+
+
+   
+
+
+
+
+
+
 
 <script>
 import firebase from "firebase";

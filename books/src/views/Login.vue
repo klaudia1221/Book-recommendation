@@ -1,12 +1,47 @@
 <template>
-	<div class="login">
-		<h3>Sign In</h3>
-		<input type="text" v-model="email" placeholder="Email"><br>
-		<input type="password" v-model="password" placeholder="Password"><br>
-		<v-btn @click="login">Sign In</v-btn>
-		<p>You don't have an account? <router-link to="/signup">Sign Up </router-link>
-</p>
-	</div>
+<div class="login">
+
+  <v-container>
+    <v-layout row>
+      <v-flex xs12 sm6 offset-sm3>
+        <v-card centered align-center>
+          <v-card-text>
+            <v-container>
+              <form>
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-text-field class="input-user"
+                      name="email"
+                      label="Mail"
+                      id="email"
+                      v-model="email"
+                      type="email"
+                      required></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout row>
+                  <v-flex xs12>
+                    <v-text-field class="input-user"
+                      name="password"
+                      label="Password"
+                      id="password"
+                      v-model="password"
+                      type="password"
+                      required></v-text-field>
+                  </v-flex>
+                </v-layout>
+           
+                
+                    <v-btn class="pink" @click="login">Login</v-btn>
+               <p>You don't have an account? <router-link to="/signup">Sign Up </router-link></p>
+              </form>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
+</div>
 </template>
 
 <script>
