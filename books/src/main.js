@@ -24,6 +24,7 @@ Vue.config.productionTip = false
 new Vue({
   router,
   vuetify,
+  
   iconfont: 'mdi' ,
   render: h => h(App)
 }).$mount('#app')

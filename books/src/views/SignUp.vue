@@ -4,7 +4,7 @@
   <v-container>
     <v-layout row>
       <v-flex xs12 sm6 offset-sm3>
-        <v-card centered align-center>
+        <v-card class="card-theme" centered align-center>
           <v-card-text>
             <v-container>
               <form>
@@ -32,7 +32,7 @@
                 </v-layout>
            
                 
-                    <v-btn class="pink" @click="signUp">SignUp</v-btn>
+                    <v-btn class="brown--text text--lighten-1" @click="signUp">SignUp</v-btn>
                
               </form>
             </v-container>
@@ -56,6 +56,7 @@
 
 <script>
 import firebase from "firebase";
+import {  mutations} from "../store.js";
 
 export default {
   name: "SignUp",
@@ -73,6 +74,9 @@ export default {
         .then(
           function() {
             alert("Your account has been created !");
+            mutations.setUser(firebase.auth().currentUser);
+          
+
           },
           function(err) {
             alert("Oops." + err.message);
@@ -105,5 +109,12 @@ p a {
   text-decoration: underline;
   cursor: pointer;
 }
+.card-theme{
+    background-color: whitesmoke;
+    /* border: 2px solid #000; */
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.9);
+
+}
+
 </style>
 	

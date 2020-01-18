@@ -1,9 +1,10 @@
 <template>
   <div class="books">
+
     <v-container>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
+          <v-text-field dark  v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
         </v-col>
       </v-row>
     </v-container>
@@ -147,5 +148,8 @@ export default {
   /* text-overflow: ellipsis; */
   /* white-space: nowrap; */
 }
+
 </style>
+
+
 

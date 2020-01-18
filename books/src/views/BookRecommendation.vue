@@ -1,35 +1,41 @@
 <template>
-  <div class="bookrecommendation">
-    <v-container fill-height fluid>
-      <v-row align="center" justify="center">
-        <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field v-model="search" centered label="Search"></v-text-field>
-        </v-col>
-      </v-row>
-    </v-container>
+ <div class="bookrecommendation">
+  <div v-if="dataReady">
+    <!-- {{current_book_id}} -->
+     <!-- {{current_book_id.rating}} -->
 
-    <div v-if="dataReady">
-         <h2>Please rate at least 20 books to get recommendations</h2>
-         
-      <v-container class="my-5">
-         
-        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages" :key="book.index">
-          <v-card class="ma-3" hover >
-            <v-card-title class="one-line">{{book["authors"]}} <p>{{book.title}}</p></v-card-title>
+      <v-container class="my-5"> <v-layout justify-center row fill-height="auto" >
+        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
+                    <v-card :to="{ name: 'bookdetails', params: { id: book.book_id }}" class="ma-3" style="display: 'block'" hover >
+
+          <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
+            <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
+            <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
+            <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
+            <v-img class="img-style" aspect-ratio="0.66" :src="book.image_url"></v-img>
            
-            <v-img :src="book.image_url"></v-img>
             <v-card-actions>
               <v-chip>
                 <v-icon left color="yellow">mdi-star</v-icon>
                 {{book.average_rating}}
               </v-chip>
-              <v-btn to="/about" right color="orange" text>Explore</v-btn>
+
+             
+            
+              <v-rating @input="addRating($event,rating.id,book.book_id)"  @click.native.stop.prevent></v-rating>
+               <!-- <v-btn
+                :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                right
+                color="orange"
+                text
+              >Explore</v-btn>  -->
+  
+              <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
             </v-card-actions>
           </v-card>
         </v-flex>
-        <v-layout wrap></v-layout>
+       </v-layout>
       </v-container>
-      <v-pagination v-model="page" :length="Math.ceil(all_books[0].length/perPage)"></v-pagination>
       <!-- <v-container class="my-5">
     <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
         <v-card class="ma-3">
@@ -44,11 +50,18 @@
       </v-flex>
       <v-layout row wrap></v-layout>
       </v-container>-->
-      <!-- <v-btn @click="getMessage">Get books</v-btn> -->
-      <p>{{all_books[0][3].authors}}</p>
+      <!-- <v-btn @click="getRecommendations">Get recommendations</v-btn> -->
       
     </div>
-  </div>
+     <v-container class="my-5"> <v-layout justify-center row fill-height="auto" >
+            
+                      <v-btn color="red" large @click="getRecommendations" style="min-width: 100px, min-height:200px">Get recommendations</v-btn>
+
+          </v-layout>
+          </v-container>
+      
+
+ </div>
 </template>
 
 <script>
@@ -58,37 +71,55 @@ export default {
   name: "BookRecommendations",
   data() {
     return {
-      all_books: [],
-
+      // all_books: [],
+      visiblePages: null,
+      rating: 0,
+      ratings: null,
+      current_book_id:[],
       dataReady: false,
       page: 1,
       perPage: 3,
-      search: ""
+      search: "",
+    
+      // URL: "http://127.0.0.1:5000/coldbooks"
+
     };
   },
-  components:{
-    // BookDetails
-  },
-  computed: {
-    filteredList() {
-      return this.all_books[0].filter(post => {
-        return post.title.toLowerCase().includes(this.search.toLowerCase());
-      });
+  methods:{ 
+
+   addRating(value,id,bk)  {
+     var BooksArray=new Array()
+     BooksArray.push(value,id,bk)
+      this.current_book_id.push(BooksArray.slice())
+     
     },
-    visiblePages() {
-      return this.filteredList.slice(
-        (this.page - 1) * this.perPage,
-        this.page * this.perPage
-      );
+    getRecommendations(){
+      if(this.current_book_id.length){
+      const URL = "http://127.0.0.1:5000/getrecommendations";
+    axios.get(URL).then(res => {
+      this.visiblePages = res.data[0];
+        this.dataReady = true;
+      
+    });
+  
+      }
+      else{
+        alert("Please provide 20 ratings to get recommendations.");
+      }
     }
+
   },
+  
+   
+    
+  
 
   mounted() {
-    const URL = "http://127.0.0.1:5000/books";
-    axios.get(URL, {params:{offset:15}}).then(res => {
-      this.all_books = res.data[0];
-
-      this.dataReady = true;
+    const URL = "http://127.0.0.1:5000/coldbooks";
+    axios.get(URL).then(res => {
+      this.visiblePages = res.data[0];
+        this.dataReady = true;
+      
       // this.visiblePages=this.all_books[0].slice((this.page - 1)*this.perPage, this.page*this.perPage)
     });
   }
@@ -109,20 +140,44 @@ export default {
 //   }
 // }
 </script>
+
 <style scoped>
 .container {
-  display: flex; /* or inline-flex */
+  display: inline-flex; /* or inline-flex */
+  flex-wrap: wrap;
+  margin-left: 5%;
+  margin-right: 5%;
 }
-.one-line{
-  font-size-adjust: inherit;
- /* overflow: hidden;  */
-  /* text-overflow: ellipsis; */
-  /* white-space: nowrap; */
+.authors-style{
+  font-size:small;
 
 }
-.h2{
-  align-content: center;
-  text-align: center;
+.list-item{
+  padding:0;
+  margin:0
+}
+.card-title-style{
+  display:inline-block;
+ width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.img-style {
+  height:10%;
+  width:100%;
+  
+  /* height: 20rem; 
+  width: 20rem;
+  min-width: 15rem;
+  /* max-width: 40rem; */
+  /* width: 100px; */
+  /* max-height: 42rem; */ 
+  /* max-width: 100px;  */
+
+  /* overflow: hidden;  */
+  /* text-overflow: ellipsis; */
+  /* white-space: nowrap; */
 }
 </style>
 

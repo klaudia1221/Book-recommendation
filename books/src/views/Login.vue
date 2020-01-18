@@ -4,7 +4,7 @@
   <v-container>
     <v-layout row>
       <v-flex xs12 sm6 offset-sm3>
-        <v-card centered align-center>
+        <v-card class="card-theme" centered align-center >
           <v-card-text>
             <v-container>
               <form>
@@ -32,7 +32,7 @@
                 </v-layout>
            
                 
-                    <v-btn class="pink" @click="login">Login</v-btn>
+                  <v-btn class="brown--text text--lighten-1" @click="login">Login</v-btn>
                <p>You don't have an account? <router-link to="/signup">Sign Up </router-link></p>
               </form>
             </v-container>
@@ -46,6 +46,8 @@
 
 <script>
 import firebase from 'firebase'
+import { store , mutations} from "../store.js";
+
 	export default{
 		name: 'Login',
 		data() {
@@ -60,6 +62,7 @@ import firebase from 'firebase'
                 firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
                     function(){
                         alert('Now you are logged in!')
+                        mutations.setUser(firebase.auth().currentUser);
                     },
                     function(err){
                         alert('Oops.'+ err.message)
@@ -68,9 +71,19 @@ import firebase from 'firebase'
 
 
             this.$router.replace('home');
-        }
+        },
+        setUser: function(){
+            mutations.setUser
+        },
 
+
+        
+        computed: {
+            user() { return store.user;}
+
+            }
         }
+       
 	}
 </script>
 
@@ -97,5 +110,12 @@ p a {
     cursor: pointer;
 
 }
+.card-theme{
+    background-color: whitesmoke;
+    /* border: 2px solid #000; */
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.9);
+
+}
+
 	</style>
 	
