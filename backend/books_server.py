@@ -3,7 +3,6 @@ import books as b
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:books@localhost/books'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -13,7 +12,7 @@ db= SQLAlchemy(app)
 CORS(app,resources={r'/*': {'origins': '*'}})
 @app.route("/ping",methods=['GET'])
 def ping():
-    df2=b.get_books_from_db("SELECT book_id, title, image_url FROM books ORDER BY 1 fetch first 10 rows only")
+    df2=b.get_data_from_db("SELECT book_id, title, image_url FROM books ORDER BY 1 fetch first 10 rows only")
     result = {}
     for index, row in df2.iterrows():
         result[index] = dict(row)
@@ -53,7 +52,7 @@ def get_books():
     print(offset)
     search="\'%"+args.get('search')+"%\'" if 'search' in args else '\'%\''
     # search='\'%John%\''
-    books = b.get_books_from_db("SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from (select * from books order by id LIMIT {} OFFSET {}) s where s.authors like {} or s.title like {}) t ".format(limit,offset,search,search));
+    books = b.get_data_from_db("SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from (select * from books order by id LIMIT {} OFFSET {}) s where s.authors like {} or s.title like {}) t ".format(limit,offset,search,search));
     print(books)
     return jsonify(books)
 
@@ -62,12 +61,68 @@ def get_book_details():
     args = request.args
     book_id = args.get('book_id')
     print(book_id)
-    books = b.get_books_from_db("SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from (select * from books order by id )s where s.book_id={})t".format(book_id))
+    books = b.get_data_from_db("SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from (select * from books order by id )s where s.book_id={})t".format(book_id))
+
     return jsonify(books)
 
+@app.route("/userbookrating",methods=["GET"])
+def get_user_book_rating():
+    args = request.args
+    book_id=args.get('book_id')
+    user_id=args.get('user_id')
+    user_book_rating= b.get_data_from_db("select rating from user_ratings where user_id={} and book_id={}".format(user_id,book_id,))
+
+    return jsonify(user_book_rating)
+
+@app.route("/userbooks",methods=["GET"])
+def get_user_books():
+    args = request.args
+    book_id=args.get('book_id')
+    user_id=args.get('user_id')
+    user_book_rating= b.get_data_from_db("select rating from user_ratings where user_id={} and book_id={}".format(user_id,book_id,))
+
+    return jsonify(user_book_rating)
+
+@app.route("/newbookrating",methods=["GET"])
+def add_new_user_book_rating():
+    args = request.args
+    user_id = args.get('user_id')
+    rating = args.get('rating')
+    print(user_id)
+    # book_id=args.get('book_id')
+    # rating= args.get('rating')
+    # user_id=args.get('user_id')
+    print(args)
+    return jsonify(args)
 
 
+def get_book_ids():
+    book_ids=b.get_data_from_db("""SELECT cast(book_id as INTEGER) FROM books where description is null ORDER BY 1""")
+    return book_ids
 
+@app.route("/coldbooks", methods=["GET"])
+def get_cold_books():
+        books = b.get_data_from_db( "SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from books order by ratings_count desc limit 20) t ");
+        print(books)
+        return jsonify(books)
+
+@app.route("/getrecommendations", methods=["GET"])
+def get_recommendations():
+    # args=request.args
+    # book_ratings = args.get('book_ratings')
+
+        books = b.get_data_from_db( "SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from books order by average_rating desc offset 102 limit 20) t ");
+        print(books)
+        return jsonify(books)
+
+@app.route("/gettop", methods=["GET"])
+def get_top():
+    # args=request.args
+    # book_ratings = args.get('book_ratings')
+
+        books = b.get_data_from_db( "SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from books order by average_rating desc limit 100) t ");
+        print(books)
+        return jsonify(books)
 
 if __name__ == "__main__":
     app.run(debug=True)

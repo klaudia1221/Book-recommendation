@@ -1,5 +1,39 @@
 <template>
+
+
+
+
   <div class="top">
+    
+          <v-tabs
+            v-model="model"
+            centered
+            slider-color="yellow"
+             background: transparent
+          >
+            <v-tab    background: transparent
+
+              v-for="i in 3"
+              :key="i"
+              :href="`#tab-${i}`"
+            >
+              Item {{ i }}
+             
+            </v-tab>
+          </v-tabs>
+    
+  
+      <!-- <v-tabs-items v-model="model">
+        <v-tab-item
+          v-for="i in 3"
+          :key="i"
+          :value="`tab-${i}`"
+        >
+          <v-card flat>
+            <v-card-text v-text="abs"></v-card-text>
+          </v-card>
+        </v-tab-item>
+      </v-tabs-items> -->
 
     <div v-if="dataReady">
       <v-container class="my-5"> <v-layout justify-center row fill-height="auto" >
@@ -74,6 +108,7 @@ export default {
       URL: "http://127.0.0.1:5000/gettop"
     };
   },
+  model: 'tab-2',
   methods: {
     doSearch() {
       axios.get(this.URL, { params: { search: this.search } }).then(res => {
