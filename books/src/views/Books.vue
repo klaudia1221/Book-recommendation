@@ -1,48 +1,54 @@
 <template>
   <div class="books">
-
     <v-container>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field dark  v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
+          <v-text-field dark v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
         </v-col>
       </v-row>
     </v-container>
 
     <div v-if="dataReady">
-      <v-container class="my-5"> <v-layout justify-center row fill-height="auto" >
-        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
-                    <v-card :to="{ name: 'bookdetails', params: { id: book.book_id }}" class="ma-3" style="display: 'block'" hover >
-
-          <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
-            <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
-            <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
-            <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
-            <v-img class="img-style" aspect-ratio="0.66" :src="book.image_url"></v-img>
-           
-            <v-card-actions>
-              <v-chip>
-                <v-icon left color="yellow">mdi-star</v-icon>
-                {{book.average_rating}}
-              </v-chip>
-
-              <v-btn
+      <v-container class="my-8">
+        <v-layout justify-center row fill-height="auto">
+          <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
+            <v-hover v-slot:default="{ hover }" open-delay="100">
+              <v-card
                 :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-                right
-                color="orange"
-                text
-              >Explore</v-btn> 
-            
-              <!-- <v-rating v-model="rating"></v-rating> -->
-  
-              <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
-            </v-card-actions>
-          </v-card>
-        </v-flex>
-       </v-layout>
+                :elevation="hover ? 24 : 6"
+                class="ma-8"
+                style="display: 'block'"
+              >
+                <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
+                <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
+                <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
+                <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
+                <v-img class="img-style" aspect-ratio="0.8" :src="book.image_url" contain></v-img>
+
+                <v-card-actions class="justify-left">
+                  <v-chip>
+                    <v-icon left color="yellow">mdi-star</v-icon>
+                    {{book.average_rating}}
+                  </v-chip>
+                  <spacer />
+                  <v-btn
+                    :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                    right
+                    color="orange"
+                    text
+                    class="mx-15"
+                  >Explore</v-btn>
+                  <!-- <v-rating v-model="rating"></v-rating> -->
+
+                  <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
+                </v-card-actions>
+              </v-card>
+            </v-hover>
+          </v-flex>
+        </v-layout>
       </v-container>
 
-      <v-pagination v-model="page" :length="Math.ceil(10000/this.perPage)" total-visible=6 ></v-pagination>
+      <v-pagination v-model="page" :length="Math.ceil(10000/this.perPage)" total-visible="6"></v-pagination>
 
       <!-- <v-container class="my-5">
     <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
@@ -117,38 +123,36 @@ export default {
   margin-left: 5%;
   margin-right: 5%;
 }
-.authors-style{
-  font-size:small;
-
+.authors-style {
+  font-size: small;
 }
-.list-item{
-  padding:0;
-  margin:0
+.list-item {
+  padding: 0;
+  margin: 0;
 }
-.card-title-style{
-  display:inline-block;
- width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.card-title-style {
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .img-style {
-  height:10%;
-  width:100%;
-  
+  height: 10%;
+  width: 100%;
+
   /* height: 20rem; 
   width: 20rem;
   min-width: 15rem;
   /* max-width: 40rem; */
   /* width: 100px; */
-  /* max-height: 42rem; */ 
+  /* max-height: 42rem; */
   /* max-width: 100px;  */
 
   /* overflow: hidden;  */
   /* text-overflow: ellipsis; */
   /* white-space: nowrap; */
 }
-
 </style>
 
 

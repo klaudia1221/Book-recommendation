@@ -1,10 +1,12 @@
 <template>
-  <v-app  style="
-    background: rgba(0,0,0,0);" >
+  <v-app  
+  style="
+    background: rgba(0,0,0,0);" 
+    >
 
-    <v-app-bar app color="brown">
-      <v-tabs fixed-tabs>
-        <v-tab to="/bookrecommendation">Get book recommendation</v-tab>
+    <v-app-bar app>
+      <v-tabs dark fixed-tabs color="white" background-color="orange">
+        <v-tab  to="/bookrecommendation">Get book recommendation</v-tab>
         <v-tab to="/books">Browse books</v-tab>
         <v-tab to="/signup">SignUp</v-tab>
         <v-tab to="/login">Login</v-tab>

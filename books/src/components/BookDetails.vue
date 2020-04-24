@@ -18,7 +18,8 @@
          <v-card-text> book rating: {{book_details.average_rating}} </v-card-text>
             
          <v-card-text>Book ratings count:{{book_details.ratings_count}}</v-card-text>
-        
+                 <v-card-text>Original year publication:{{book_details.original_publication_year}}</v-card-text>
+
         
         <!-- <v-card-title{{book["authors"]}} <p>{{book.title}}</p></v-card-title>
            
@@ -74,8 +75,8 @@ export default {
 <style>
 
 .cover-style {
-max-height: 400px;
-max-width: 200px; 
+max-height: 600px;
+max-width: 300px; 
 margin-left: 1%
 }
 </style>
