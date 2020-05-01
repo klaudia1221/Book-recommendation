@@ -6,56 +6,72 @@
     <!-- <p>Current route name: {{ $route.params.id }}</p> -->
     <v-container fluid>
       <!-- <v-layout row justify-space-between> -->
-        <!-- <v-flex> -->
+      <!-- <v-flex> -->
 
+      <v-card class="mx-5">
+        <div class="d-flex flex-no-wrap">
+          <v-avatar class="ma-5" height="700px" min-width="450px" tile>
+            <v-img :src="book_details.image_url" object-fit: fill-height></v-img>
+          </v-avatar>
+          <div>
+            <v-card-title  >{{book_details.title}}</v-card-title>
 
-          <v-card class="mx-5">
-            <div class="d-flex flex-no-wrap">
-              <v-avatar class="ma-5" height="700px" min-width="450px" tile>
-                <v-img :src="book_details.image_url" object-fit: fill-height></v-img>
-              </v-avatar>
-              <div>
+            <v-card-subtitle v-text="book_details.authors"  >  </v-card-subtitle>
+            <v-card-subtitle class="mt-n7" v-text="book_details.original_publication_year"  >
+
                
-                   
-                      <v-card-title>{{book_details.title}}</v-card-title>
+            
+            </v-card-subtitle>
 
-                      <v-card-subtitle v-text="book_details.authors"></v-card-subtitle>
-                                        <v-card-text style="font-size:1em">Original publication year:  {{book_details.original_publication_year}}</v-card-text>
-
-                      <v-card-text>
-                        <span v-html="book_details.description"></span>
-                      </v-card-text>
-                   
-              </div>
-              <div>
-                <v-card class="ma-5" height="700px" width="450px">
-                  <v-card-title class="justify-center">Averege book rating</v-card-title>
-                  
-                  <v-card-text class="text-md-center" style="font-size:3em">
-                    <v-icon color="orange">mdi-star</v-icon>
-                  {{book_details.average_rating}}
-                  </v-card-text>
-                  <v-card-text style="font-size:1em">{{book_details.ratings_count}} ratings 
-                    {{book_details.work_text_reviews_count}} text reviews
-                  </v-card-text>
-                  <v-divider >
-       
-                  </v-divider>
-                  <v-card-text class="text-md-center" style="font-size:2em">Genres</v-card-text>
-                </v-card>
-              </div>
-            </div>
+             
            
-          </v-card>
-       
-        <!-- </v-flex> -->
+
+            <v-card-text>
+              <span v-html="book_details.description"></span>
+            </v-card-text>
+          </div>
+          <div>
+            <v-card class="ma-5" style="height:700px; width:450px">
+              <v-card-title class="orange lighten-5 justify-center" style="font-size:1.4em">Averege book rating</v-card-title>
+
+              <v-card-text class="text-md-center mt-8" style="font-size:3em; color:orange">
+                <v-icon color="orange">mdi-star</v-icon>
+                {{book_details.average_rating}}
+              </v-card-text>
+              <v-card-text
+                class="text-md-center"
+                style="font-size:1.3em"
+              >{{formatNumber(book_details.ratings_count) }} ratings</v-card-text>
+              <v-card-text
+                class="text-md-center mt-n3"
+                style="font-size:1.3em"
+              >{{formatNumber(book_details.work_text_reviews_count)}} text reviews</v-card-text>
+
+              <v-divider class='white'></v-divider>
+              <v-card-title class=" orange lighten-5 justify-center" style="font-size:1.4em">
+                Genres</v-card-title>
+                 <v-list disabled>
+                    <v-list-item-group v-model="item" color="primary">
+                   <v-list-item
+             v-for="b in book_genres" :key="b"
+           
+          >  <v-list-item-content><v-card-text
+                class="text-md-center"
+                style="font-size:1.2em"  v-text="formatGenre(b[0])"></v-card-text><v-divider class='dark'></v-divider></v-list-item-content></v-list-item></v-list-item-group>
+                             </v-list>
+
+            </v-card>
+          </div>
+        </div>
+      </v-card>
+
+      <!-- </v-flex> -->
       <!-- </v-layout> -->
     </v-container>
   </div>
 </template>
 
 <script>
-
 import axios from "axios";
 
 export default {
@@ -64,11 +80,13 @@ export default {
 
   data: () => ({
     book_details: null,
+    book_genres: null,
     rating: null,
     // book_id:this.id,
     user_id: 1,
     book_details_URL: "http://127.0.0.1:5000/bookdetails",
-    user_ratings_URL: "http://127.0.0.1:5000/userbookrating"
+    user_ratings_URL: "http://127.0.0.1:5000/userbookrating",
+    book_genres_URL: "http://127.0.0.1:5000/bookgenres"
   }),
   mounted() {
     axios
@@ -86,7 +104,23 @@ export default {
       .then(res => {
         this.rating = res.data[0][0];
       });
+    axios
+      .get(this.book_genres_URL, {
+        params: { book_id: this.id }
+      })
+      .then(res => {
+        this.book_genres = res.data;
+      });
   },
+  methods: {
+    formatNumber(x) {
+      return parseInt(x).toLocaleString();
+    },
+    formatGenre(x){
+      return x.replace(/_/g, " ")
+    }
+  },
+
   watch: {
     rating() {
       axios.get("http://127.0.0.1:5000/newbookrating", {
