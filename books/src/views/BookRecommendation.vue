@@ -1,28 +1,57 @@
 <template>
  <div class="bookrecommendation">
-  <div v-if="dataReady">
-    <!-- {{current_book_id}} -->
-     <!-- {{current_book_id.rating}} -->
-
-      <v-container class="my-5"> <v-layout justify-center row fill-height="auto" >
-        <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
-                    <v-card :to="{ name: 'bookdetails', params: { id: book.book_id }}" class="ma-3" style="display: 'block'" hover >
-
-          <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
-            <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
-            <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
-            <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
-            <v-img class="img-style" aspect-ratio="0.66" :src="book.image_url"></v-img>
+   <div v-if="dataReady">
+     <h1>{{this.not_read}}</h1>
+      <v-container class="my-8">
+        <v-layout justify-center row fill-height="auto">
+          <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
+            <v-hover v-slot:default="{ hover }" open-delay="100">
+              <v-card
+                :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                :elevation="hover ? 24 : 6"
+                class="ma-8"
+                style="display: 'block'"
+             
+              >
+             <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
+                <v-card-text class="card-title-style mt-n5" >{{book["authors"]}}</v-card-text>
+                 <v-hover v-slot:default="{ hover }">
+                <v-img class="img-style mt-n3"  aspect-ratio="0.85" object-fit: contain :src="book.book_cover_url" >
+<v-expand-transition>
+            <div
+              v-if="hover"
+              class="d-flex transition-fast-in-fast-out white darken-2 v-card--reveal display-1 grey--text"
+              style="height: 20%;"
+            ><v-icon class="mx-3"  color="orange">mdi-star</v-icon>
+              {{book.average_rating}}
+            </div>
+          </v-expand-transition>
+                 
+                </v-img>
+  </v-hover>
            
-            <v-card-actions>
-              <v-chip>
-                <v-icon left color="yellow">mdi-star</v-icon>
-                {{book.average_rating}}
-              </v-chip>
-
+                  <!-- <v-chip>
+                    <v-icon color="yellow">mdi-star</v-icon>
+                    {{book.average_rating}}
+                  </v-chip> -->
+                   <v-rating class='text-center'   background-color="grey lighten-1" color="red" @input="addRating($event,rating.id,book.book_id)"  @click.native.stop.prevent></v-rating>
+                  
+                  <!-- <v-btn
+                    :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                    color="orange" dark
+                    text
+                     
+                    class="mr-3"
+                  >Explore</v-btn> -->
+                  <div class='text-center'><v-btn class="ma-2" color="red"  @click='addToNotInterested(book.book_id)'  @click.native.stop.prevent dark>NOT INTERESTED
+          <v-icon dark right>mdi-cancel</v-icon>
+        </v-btn>
+                  <v-btn class="ma-2" color="orange" @click='addToNotRead(book.book_id)' @click.native.stop.prevent  dark>NOT READ
+          <v-icon dark right>mdi-eye-off</v-icon>
+        </v-btn></div>
              
             
-              <v-rating @input="addRating($event,rating.id,book.book_id)"  @click.native.stop.prevent></v-rating>
+             
                <!-- <v-btn
                 :to="{ name: 'bookdetails', params: { id: book.book_id }}"
                 right
@@ -31,10 +60,10 @@
               >Explore</v-btn>  -->
   
               <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
-            </v-card-actions>
-          </v-card>
-        </v-flex>
-       </v-layout>
+              </v-card>
+            </v-hover>
+          </v-flex>
+        </v-layout>
       </v-container>
       <!-- <v-container class="my-5">
     <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
@@ -80,6 +109,8 @@ export default {
       page: 1,
       perPage: 3,
       search: "",
+      not_interested: [],
+      not_read: [],
     
       // URL: "http://127.0.0.1:5000/coldbooks"
 
@@ -92,6 +123,16 @@ export default {
      BooksArray.push(value,id,bk)
       this.current_book_id.push(BooksArray.slice())
      
+    },
+    addToNotRead(id){
+      var BooksArray=new Array()
+      BooksArray.push(id)
+      this.not_read.push(BooksArray.slice())
+    },
+    addToNotInterested(id){
+      var BooksArray=new Array()
+      BooksArray.push(id)
+      this.not_interested.push(BooksArray.slice())
     },
     getRecommendations(){
       if(this.current_book_id.length){
@@ -162,6 +203,14 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.v-card--reveal {
+align-items: center;
+bottom: 0;
+justify-content: center;
+opacity: .8;
+position: absolute;
+width: 100%;
 }
 .img-style {
   height:10%;

@@ -1,6 +1,6 @@
 <template>
   <div class="top">
-    <v-tabs dark background-color="transparent" color="orange" v-model="model" centered slider-color="orange" background: transparent>
+    <v-tabs dark background-color="transparent"  color="orange" v-model="model" centered slider-color="orange" background: transparent>
     <v-tab @click="getTopPopular()">Most popular</v-tab>
     <v-tab @click="getTopRated()">Best rated</v-tab>
     </v-tabs>
@@ -17,21 +17,23 @@
             >
               <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
               <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
-              <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
-              <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
-              <v-img class="img-style" aspect-ratio="0.66" :src="book.image_url"></v-img>
+              <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
+              <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
+              <v-img class="img-style mt-n3" aspect-ratio="0.66"  :src="book.book_cover_url"></v-img>
 
               <v-card-actions>
-                <v-chip>
+               <v-chip class='ml-3'>
                   <v-icon left color="yellow">mdi-star</v-icon>
                   {{book.average_rating}}
                 </v-chip>
-
+<v-spacer></v-spacer>
                 <v-btn
                   :to="{ name: 'bookdetails', params: { id: book.book_id }}"
                   right
                   color="orange"
                   text
+                  class=" mr-3"
+
                 >Explore</v-btn>
 
                 <!-- <v-rating v-model="rating"></v-rating> -->

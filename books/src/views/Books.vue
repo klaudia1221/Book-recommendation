@@ -3,7 +3,8 @@
     <v-container>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field dark v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
+          <v-text-field dark
+ v-model="search"  centered label="Search" @keydown.enter="doSearch"></v-text-field>
         </v-col>
       </v-row>
     </v-container>
@@ -18,25 +19,26 @@
                 :elevation="hover ? 24 : 6"
                 class="ma-8"
                 style="display: 'block'"
+             
               >
                 <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
                 <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
-                <v-card-title class="card-title-style">{{book["authors"]}}</v-card-title>
-                <v-card-text class="card-title-style">{{book["title"]}}</v-card-text>
-                <v-img class="img-style" aspect-ratio="0.8" :src="book.image_url" contain></v-img>
+                <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
+                <v-card-text class="card-title-style mt-n5" >{{book["authors"]}}</v-card-text>
+                <v-img class="img-style mt-n3"  aspect-ratio="0.85" object-fit: contain :src="book.book_cover_url" ></v-img>
 
-                <v-card-actions class="justify-left">
-                  <v-chip>
-                    <v-icon left color="yellow">mdi-star</v-icon>
+                <v-card-actions >
+                  <v-chip class='ml-3'>
+                    <v-icon  color="yellow">mdi-star</v-icon>
                     {{book.average_rating}}
                   </v-chip>
-                  <spacer />
+                  <v-spacer></v-spacer>
                   <v-btn
                     :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-                    right
                     color="orange"
                     text
-                    class="mx-15"
+                     
+                    class="mr-3"
                   >Explore</v-btn>
                   <!-- <v-rating v-model="rating"></v-rating> -->
 

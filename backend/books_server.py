@@ -77,8 +77,8 @@ def add_new_user_book_rating():
     return jsonify(args)
 
 
-def get_book_ids():
-    book_ids=b.get_data_from_db("""SELECT cast(book_id as INTEGER) FROM books where description is null ORDER BY 1""")
+def get_book_ids(column):
+    book_ids=b.get_data_from_db("""SELECT cast(book_id as INTEGER) FROM books where {} is null ORDER BY 1""".format(column))
     return book_ids
 
 @app.route("/coldbooks", methods=["GET"])
