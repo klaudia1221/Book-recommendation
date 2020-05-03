@@ -3,8 +3,7 @@
     <v-container>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="6" md="3" align-content-center>
-          <v-text-field dark
- v-model="search"  centered label="Search" @keydown.enter="doSearch"></v-text-field>
+          <v-text-field dark v-model="search" centered label="Search" @keydown.enter="doSearch"></v-text-field>
         </v-col>
       </v-row>
     </v-container>
@@ -19,17 +18,25 @@
                 :elevation="hover ? 24 : 6"
                 class="ma-8"
                 style="display: 'block'"
-             
               >
                 <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
                 <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
                 <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
-                <v-card-text class="card-title-style mt-n5" >{{book["authors"]}}</v-card-text>
-                <v-img class="img-style mt-n3"  aspect-ratio="0.85" object-fit: contain :src="book.book_cover_url" ></v-img>
+                <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
+                                <v-card-text class="card-title-style mt-n5">{{book.book_cover_url}}</v-card-text>
 
-                <v-card-actions >
-                  <v-chip class='ml-3'>
-                    <v-icon  color="yellow">mdi-star</v-icon>
+                <v-img
+                  class="img-style mt-n3"
+                  aspect-ratio="0.85"
+                  object-fit:
+                  contain
+                  :src="book.book_cover_url"
+               
+                ></v-img>
+
+                <v-card-actions>
+                  <v-chip class="ml-3">
+                    <v-icon color="yellow">mdi-star</v-icon>
                     {{book.average_rating}}
                   </v-chip>
                   <v-spacer></v-spacer>
@@ -37,7 +44,6 @@
                     :to="{ name: 'bookdetails', params: { id: book.book_id }}"
                     color="orange"
                     text
-                     
                     class="mr-3"
                   >Explore</v-btn>
                   <!-- <v-rating v-model="rating"></v-rating> -->
@@ -96,7 +102,8 @@ export default {
         this.search = null;
         this.visiblePages = res.data[0];
       });
-    }
+    },
+    
   },
   watch: {
     page() {
@@ -107,6 +114,8 @@ export default {
         });
     }
   },
+
+
 
   mounted() {
     axios

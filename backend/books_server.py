@@ -78,8 +78,12 @@ def add_new_user_book_rating():
 
 
 def get_book_ids(column):
-    book_ids=b.get_data_from_db("""SELECT cast(book_id as INTEGER) FROM books where {} is null ORDER BY 1""".format(column))
+    book_ids=b.get_data_from_db("""SELECT cast(book_id as INTEGER) FROM books where {} is null""".format(column))
     return book_ids
+
+def get_book_cover_urls():
+    book_cover_urls=b.get_data_from_db("""SELECT cast(book_id as INTEGER), image_url FROM books where book_cover_url is null and image_url like 'https://images.gr-assets.com/books/%'""")
+    return book_cover_urls
 
 @app.route("/coldbooks", methods=["GET"])
 def get_cold_books():
