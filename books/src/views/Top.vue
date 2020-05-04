@@ -6,63 +6,58 @@
     </v-tabs>
 
     <div v-if="dataReady">
-      <v-container class="my-5">
-        <v-layout justify-center row fill-height="auto">
+      <v-container class="my-8">
+        <v-layout justify-center row fill-height="auto" >
           <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
-            <v-card
-              :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-              class="ma-3"
-              style="display: 'block'"
-              hover
-            >
-              <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
-              <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
-              <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
-              <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
-              <v-img class="img-style mt-n3" aspect-ratio="0.66"  :src="book.book_cover_url"></v-img>
+            <v-hover v-slot:default="{ hover }" open-delay="100">
+              <v-card
+                :to="{ name: 'bookdetails', params: { id: book.book_id }}"
+                :elevation="hover ? 24 : 6"
+                class="ma-8"
+                
+                style="display: 'block'"
+              >
+                <!-- <v-card  class="ma-3" style="display: 'block'" hover > -->
+                <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
+                <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
+                <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
 
-              <v-card-actions>
-               <v-chip class='ml-3'>
-                  <v-icon left color="yellow">mdi-star</v-icon>
-                  {{book.average_rating}}
-                </v-chip>
-<v-spacer></v-spacer>
-                <v-btn
-                  :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-                  right
-                  color="orange"
-                  text
-                  class=" mr-3"
+                <v-img
+                  class="img-style mt-n3 "
+                  aspect-ratio="0.668"
+                  object-fit:
+                  cover
+            
+                  :src="book.book_cover_url"
+                > 
+                 <v-expand-transition>
+                      <div
+                        v-if="hover"
+                        class="d-flex transition-fast-in-fast-out white darken-2 v-card--reveal display-1 grey--text"
+                        style="height: 20%;"
+                      >
+                        <v-icon class="mx-3" color="orange">mdi-star</v-icon>
+                        {{book.average_rating}}
+                      </div>
+                    </v-expand-transition>
+                    <div>
+                   <v-card-actions>
+                   </v-card-actions>
+                    </div>
+                </v-img>
+              
+            
+      
+         
+            
 
-                >Explore</v-btn>
-
-                <!-- <v-rating v-model="rating"></v-rating> -->
-
-                <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
-              </v-card-actions>
-            </v-card>
+                
+         
+              </v-card>
+            </v-hover>
           </v-flex>
         </v-layout>
       </v-container>
-
-      <!-- <v-pagination v-model="page" :length="Math.ceil(100/this.perPage)" total-visible=6 ></v-pagination> -->
-
-      <!-- <v-container class="my-5">
-    <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
-        <v-card class="ma-3">
-          <v-card-title>{{book.title}}</v-card-title>
-          <v-img :src="book.image_url"></v-img>
-          <v-card-actions>
-            <v-btn color="orange" text>Share</v-btn>
-
-            <v-btn color="orange" text>Explore</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-      <v-layout row wrap></v-layout>
-      </v-container>-->
-      <!-- <v-btn @click="getMessage">Get books</v-btn> -->
-      <!-- <p>{{visiblePages[0][3].authors}}</p> -->
     </div>
   </div>
 </template>
@@ -133,6 +128,14 @@ export default {
 .list-item {
   padding: 0;
   margin: 0;
+}
+.v-card--reveal {
+  align-items: center;
+  bottom: 0;
+  justify-content: center;
+  opacity: 0.8;
+  position: absolute;
+  width: 100%;
 }
 .card-title-style {
   display: inline-block;

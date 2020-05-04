@@ -10,14 +10,15 @@
         <v-layout justify-end mr-5>
           <v-btn color="orange" @click="clearRatings()" dark>Clear book ratings</v-btn>
         </v-layout>
-        <v-layout justify-center row fill-height="auto">
-          <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
+        <v-layout justify-center row>
+          <v-flex class="items" xs12 sm4 md2 lg3  v-for="book in visiblePages[0]" :key="book.index">
             <v-hover v-slot:default="{ hover }" open-delay="100">
               <v-card
                 :to="{ name: 'bookdetails', params: { id: book.book_id }}"
                 :elevation="hover ? 24 : 6"
-                class="ma-8"
+                class="card ma-8"
                 style="display: 'block'"
+
               >
                 <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
                 <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
@@ -250,6 +251,12 @@ export default {
   position: absolute;
   width: 100%;
 }
+.items{
+  flex-wrap: nowrap;
+  
+}
+
+
 .img-style {
   height: 10%;
   width: 100%;
@@ -265,6 +272,7 @@ export default {
   /* overflow: hidden;  */
   /* text-overflow: ellipsis; */
   /* white-space: nowrap; */
+  
 }
 </style>
 
