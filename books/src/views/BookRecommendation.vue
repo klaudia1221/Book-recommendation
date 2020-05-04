@@ -1,23 +1,27 @@
 <template>
   <div class="bookrecommendation">
     <div v-if="dataReady">
-      <!-- <h1>{{this.not_read}}</h1>
+      <!-- <h1>{{this.to_read}}</h1> 
       <h1>{{this.not_interested}}</h1>
-      <h1>{{this.user_book_ratings_list}}</h1>
-      <h2>{{this.temp_book_ratings}}</h2>-->
+            <h1>{{this.temp_not_interested}}</h1> -->
+
+      <!-- <h1>{{this.user_book_ratings_list}}</h1>
+      <h2>{{this.temp_book_ratings}}</h2>--> -->
 
       <v-container class="my-8">
         <v-layout justify-end mr-5>
-          <v-btn color="orange" @click="clearRatings()" dark>Clear book ratings</v-btn>
+          <v-btn color="orange" @click="clearRatingsAndReload()" dark>Clear book ratings</v-btn>
         </v-layout>
         <v-layout justify-center row>
-          <v-flex class="items" xs12 sm4 md2 lg3  v-for="book in visiblePages[0]" :key="book.index">
+          <v-flex class="items" xs12 sm4 md2 lg3  v-for="(book, index) in visiblePages[0]" :key="book.index">
+            <div v-if="IsIn(book.book_id, index)">
             <v-hover v-slot:default="{ hover }" open-delay="100">
               <v-card
                 :to="{ name: 'bookdetails', params: { id: book.book_id }}"
                 :elevation="hover ? 24 : 6"
                 class="card ma-8"
                 style="display: 'block'"
+
 
               >
                 <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
@@ -54,7 +58,8 @@
                   <v-btn
                     class="ma-3 mb-4"
                     color="red"
-                    @click="addToNotInterested(book.book_id)"
+                    @click="addToNotInterested(book.book_id, index)"
+                    delete
                     @click.native.stop.prevent
                     dark
                   >
@@ -64,16 +69,18 @@
                   <v-btn
                     class="ma-2"
                     color="orange"
-                    @click="addToNotRead(book.book_id)"
+                    @click="addToToRead(book.book_id,index)"
+                    delete
                     @click.native.stop.prevent
                     dark
                   >
-                    NOT READ
+                    TO READ
                     <v-icon dark right>mdi-eye-off</v-icon>
                   </v-btn>
                 </div>
               </v-card>
             </v-hover>
+            </div>
           </v-flex>
         </v-layout>
       </v-container>
@@ -96,7 +103,10 @@ import axios from "axios";
 import firebase from "firebase";
 // import BookDetails from "@components/BookDetails.vue"
 const database = firebase.database();
-const ref = database.ref("books/TempRatings");
+const RatingsRef = database.ref("books/TempRatings");
+const ToReadRef= database.ref("books/TempToRead");
+const NotInterestedRef=database.ref("books/TempNotInterested");
+
 export default {
   name: "BookRecommendations",
   data() {
@@ -104,6 +114,8 @@ export default {
       // all_books: [],
       visiblePages: null,
       temp_book_ratings: null,
+      temp_to_read:null,
+      temp_not_interested: null,
       // rating: {'3':1},
       ratings: null,
       user_book_ratings_list: [],
@@ -112,7 +124,7 @@ export default {
       perPage: 3,
       search: "",
       not_interested: [],
-      not_read: []
+      to_read: []
 
       // URL: "http://127.0.0.1:5000/coldbooks"
     };
@@ -121,25 +133,39 @@ export default {
     //   updateRatings() {
 
     // })
-    clearRatings() {
+    IsIn(id, index){
+      if ((this.to_read.indexOf(id.toString()) === -1)&&(this.not_interested.indexOf(id.toString()) === -1)){
+        return true;
+      }
+      else {
+      this.$delete(this.visiblePages[0],index);
+
+        return false;}
+    },
+     clearRatings() {
       this.user_book_ratings_list = [];
-      ref.remove();
+      RatingsRef.remove();
+      ToReadRef.remove();
+      NotInterestedRef.remove();
+      
+    },
+    clearRatingsAndReload() {
+      this.user_book_ratings_list = [];
+      RatingsRef.remove();
+      ToReadRef.remove();
+      NotInterestedRef.remove()
       window.location.reload();
     },
-    getRating() {
-      return 2;
-    },
-    storeBookRating(book_id, rating) {
-      // ref.push({ book_id: book_id, rating: rating });
-      ref.push({ book_id: rating });
-    },
-    deleteBookRating(book_id) {
-      ref.child(book_id.id).remove();
-    },
-  
-
+    // storeBookRating(book_id, rating) {
+    //   // RatingsRef.push({ book_id: book_id, rating: rating });
+    //   RatingsRef.push({ book_id: rating });
+    // },
+    // deleteBookRating(book_id) {
+    //   RatingsRef.child(book_id.id).remove();
+    // },
+    
     addRating(book_id, value) {
-      ref.child(book_id).set(value);
+      RatingsRef.child(book_id).set(value);
       var is_in_list = false;
       for (var i = 0; i < this.user_book_ratings_list.length; i++) {
         if (this.user_book_ratings_list[i][0] === book_id) {
@@ -155,18 +181,25 @@ export default {
       }
     },
 
-    addToNotRead(id) {
-      if (this.not_read.indexOf(id) === -1) {
-        this.not_read.push(id);
+    addToToRead(id, index) {
+      if (this.to_read.indexOf(id) === -1) {
+        this.to_read.push(id);
       }
+      ToReadRef.child(id).set("false");
+      this.$delete(this.visiblePages[0],index);
+
     },
-    addToNotInterested(id) {
+    addToNotInterested(id, index) {
       if (this.not_interested.indexOf(id) === -1) {
         this.not_interested.push(id);
       }
+      NotInterestedRef.child(id).set("false");
+
+      this.$delete(this.visiblePages[0],index);
+
     },
     readfromFirebase() {
-      ref.once("value", snapshot => {
+      RatingsRef.once("value", snapshot => {
         this.temp_book_ratings = { ...snapshot.val(), id: snapshot.key };
         for (var key in this.temp_book_ratings) {
           //  console.log(key);
@@ -176,23 +209,48 @@ export default {
           this.user_book_ratings_list.push(RatingsArray);
         }
       });
+      ToReadRef.once("value", snapshot => {
+        this.temp_to_read = { ...snapshot.val(), id: snapshot.key };
+        for (var key in this.temp_to_read) {
+          // var TempArray = new Array();
+          // TempArray.push(key);
+          // TempArray.push(this.temp_to_read[key]);
+          // this.to_read.push(TempArray);
+          this.to_read.push(key);
+        }
+      });
+      NotInterestedRef.once("value", snapshot => {
+        this.temp_not_interested = { ...snapshot.val(), id: snapshot.key };
+        for (var key in this.temp_not_interested) {
+          // var TempArray = new Array();
+          // TempArray.push(key);
+          // TempArray.push(this.temp_not_interested[key]);
+          // this.not_interested.push(TempArray);
+          // this.to_read.push(key);
+          this.not_interested.push(key);
+        }
+      });
+     
     },
+    
     getRecommendations() {
       if (this.user_book_ratings_list.length) {
         window.scrollTo(0, 0);
+        this.readfromFirebase();
         const URL = "http://127.0.0.1:5000/getrecommendations";
-        axios.get(URL).then(res => {
+        axios.get(URL,{params:{ratings:JSON.stringify(this.user_book_ratings_list), not_interested: JSON.stringify(this.not_interested), to_read: JSON.stringify(this.to_read) }}).then(res => {
           this.visiblePages = res.data[0];
           this.dataReady = true;
         });
       } else {
         alert("Please provide 20 ratings to get recommendations.");
       }
+      this.clearRatings();
     }
   },
 
   mounted() {
-    // ref.once("value", snapshot => {
+    // RatingsRef.once("value", snapshot => {
     //     this.temp_book_ratings={ ...snapshot.val(), id: snapshot.key };
     //   });
     this.readfromFirebase();

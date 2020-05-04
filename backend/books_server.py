@@ -25,7 +25,7 @@ def get_books():
     limit = args.get('limit') if 'limit' in args else 10000
     offset=(int(page)-1)*int(limit)
     print(offset)
-    search="\'%"+(args.get('search')).lower()+"%\'" if 'search' in args else '\'%\''
+    search="\'%"+(args.get('search')).lower()+"%\'" if ('search' in args ) and (len((args.get('search')))>1) else '\'%\''
     # search='\'%John%\''
     books = b.get_data_from_db("SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from (select * from books order by id LIMIT {} OFFSET {}) s where LOWER(s.authors) like {} or LOWER(s.title) like {}) t ".format(limit,offset,search,search));
     print(books)
@@ -93,11 +93,16 @@ def get_cold_books():
 
 @app.route("/getrecommendations", methods=["GET"])
 def get_recommendations():
-    # args=request.args
-    # book_ratings = args.get('book_ratings')
+        args=request.args
+        ratings = args.get('ratings')
+        to_read=args.get('to_read')
+        not_interested=args.get('not_interested')
 
         books = b.get_data_from_db( "SELECT array_to_json(array_agg(row_to_json(t))) FROM (select * from books order by average_rating desc offset 102 limit 20) t ");
-        print(books)
+        print("ratings"+str(ratings))
+        print("not_interested"+str(not_interested))
+
+        print("to_read"+str(to_read))
         return jsonify(books)
 
 @app.route("/toprated", methods=["GET"])

@@ -62,7 +62,7 @@
         </v-layout>
       </v-container>
 
-      <v-pagination v-if="paginate" v-model="page" :length="Math.ceil(10000/this.perPage)" total-visible="6"></v-pagination>
+      <v-pagination v-if="paginate" v-model="page" :length="Math.ceil(10000/this.perPage)" total-visible="6" color="orange" light></v-pagination>
 
       <!-- <v-container class="my-5">
     <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
