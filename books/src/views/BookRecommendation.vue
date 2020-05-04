@@ -3,9 +3,13 @@
     <div v-if="dataReady">
       <!-- <h1>{{this.not_read}}</h1>
       <h1>{{this.not_interested}}</h1>
-      <h1>{{this.user_book_ratings_list}}</h1> -->
+      <h1>{{this.user_book_ratings_list}}</h1>
+      <h2>{{this.temp_book_ratings}}</h2>-->
 
       <v-container class="my-8">
+        <v-layout justify-end mr-5>
+          <v-btn color="orange" @click="clearRatings()" dark>Clear book ratings</v-btn>
+        </v-layout>
         <v-layout justify-center row fill-height="auto">
           <v-flex xs12 sm4 md2 lg3 v-for="book in visiblePages[0]" :key="book.index">
             <v-hover v-slot:default="{ hover }" open-delay="100">
@@ -37,26 +41,14 @@
                     </v-expand-transition>
                   </v-img>
                 </v-hover>
-
-                <!-- <v-chip>
-                    <v-icon color="yellow">mdi-star</v-icon>
-                    {{book.average_rating}}
-                </v-chip>-->
                 <v-rating
                   class="text-center"
                   background-color="grey lighten-1"
                   color="red"
+                  v-model="temp_book_ratings[book.book_id]"
                   @input="addRating(book.book_id,$event,)"
                   @click.native.stop.prevent
                 ></v-rating>
-
-                <!-- <v-btn
-                    :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-                    color="orange" dark
-                    text
-                     
-                    class="mr-3"
-                >Explore</v-btn>-->
                 <div class="text-center">
                   <v-btn
                     class="ma-3 mb-4"
@@ -79,35 +71,11 @@
                     <v-icon dark right>mdi-eye-off</v-icon>
                   </v-btn>
                 </div>
-
-                <!-- <v-btn
-                :to="{ name: 'bookdetails', params: { id: book.book_id }}"
-                right
-                color="orange"
-                text
-                >Explore</v-btn>-->
-
-                <!-- <router-link :to="{ name: 'bookdetails', params: { id: book.book_id }}">Details</router-link> -->
               </v-card>
             </v-hover>
           </v-flex>
         </v-layout>
       </v-container>
-      <!-- <v-container class="my-5">
-    <v-flex xs12 sm4 md2 lg3 v-for="item in all_books" :key="book.title">
-        <v-card class="ma-3">
-          <v-card-title>{{book.title}}</v-card-title>
-          <v-img :src="book.image_url"></v-img>
-          <v-card-actions>
-            <v-btn color="orange" text>Share</v-btn>
-
-            <v-btn color="orange" text>Explore</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-      <v-layout row wrap></v-layout>
-      </v-container>-->
-      <!-- <v-btn @click="getRecommendations">Get recommendations</v-btn> -->
     </div>
     <v-container class="my-5">
       <v-layout justify-center row fill-height="auto">
@@ -124,14 +92,18 @@
 
 <script>
 import axios from "axios";
+import firebase from "firebase";
 // import BookDetails from "@components/BookDetails.vue"
+const database = firebase.database();
+const ref = database.ref("books/TempRatings");
 export default {
   name: "BookRecommendations",
   data() {
     return {
       // all_books: [],
       visiblePages: null,
-      rating: 0,
+      temp_book_ratings: null,
+      // rating: {'3':1},
       ratings: null,
       user_book_ratings_list: [],
       dataReady: false,
@@ -145,7 +117,28 @@ export default {
     };
   },
   methods: {
+    //   updateRatings() {
+
+    // })
+    clearRatings() {
+      this.user_book_ratings_list = [];
+      ref.remove();
+      window.location.reload();
+    },
+    getRating() {
+      return 2;
+    },
+    storeBookRating(book_id, rating) {
+      // ref.push({ book_id: book_id, rating: rating });
+      ref.push({ book_id: rating });
+    },
+    deleteBookRating(book_id) {
+      ref.child(book_id.id).remove();
+    },
+  
+
     addRating(book_id, value) {
+      ref.child(book_id).set(value);
       var is_in_list = false;
       for (var i = 0; i < this.user_book_ratings_list.length; i++) {
         if (this.user_book_ratings_list[i][0] === book_id) {
@@ -157,9 +150,10 @@ export default {
         var BooksArray = new Array();
         BooksArray.push(book_id, value);
         this.user_book_ratings_list.push(BooksArray);
+        // this.storeBookRating(book_id,value);
       }
     },
-    updateRatings() {},
+
     addToNotRead(id) {
       if (this.not_read.indexOf(id) === -1) {
         this.not_read.push(id);
@@ -170,8 +164,21 @@ export default {
         this.not_interested.push(id);
       }
     },
+    readfromFirebase() {
+      ref.once("value", snapshot => {
+        this.temp_book_ratings = { ...snapshot.val(), id: snapshot.key };
+        for (var key in this.temp_book_ratings) {
+          //  console.log(key);
+          var RatingsArray = new Array();
+          RatingsArray.push(key);
+          RatingsArray.push(this.temp_book_ratings[key]);
+          this.user_book_ratings_list.push(RatingsArray);
+        }
+      });
+    },
     getRecommendations() {
       if (this.user_book_ratings_list.length) {
+        window.scrollTo(0, 0);
         const URL = "http://127.0.0.1:5000/getrecommendations";
         axios.get(URL).then(res => {
           this.visiblePages = res.data[0];
@@ -184,6 +191,10 @@ export default {
   },
 
   mounted() {
+    // ref.once("value", snapshot => {
+    //     this.temp_book_ratings={ ...snapshot.val(), id: snapshot.key };
+    //   });
+    this.readfromFirebase();
     const URL = "http://127.0.0.1:5000/coldbooks";
     axios.get(URL).then(res => {
       this.visiblePages = res.data[0];

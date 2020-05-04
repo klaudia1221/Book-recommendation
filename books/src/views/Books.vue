@@ -23,7 +23,6 @@
                 <!-- <div :to="{ name: 'bookdetails', params: { id: book.book_id }}"> -->
                 <v-card-title class="card-title-style">{{book["title"]}}</v-card-title>
                 <v-card-text class="card-title-style mt-n5">{{book["authors"]}}</v-card-text>
-                                <v-card-text class="card-title-style mt-n5">{{book.book_cover_url}}</v-card-text>
 
                 <v-img
                   class="img-style mt-n3"
